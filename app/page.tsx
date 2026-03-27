@@ -1,65 +1,116 @@
-import Image from "next/image";
+import Link from "next/link";
+import { getPublishedPosts } from "@/lib/posts";
 
-export default function Home() {
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "medium",
+  }).format(date);
+}
+
+export default async function Home() {
+  const posts = await getPublishedPosts();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-12 px-6 py-10 lg:px-10">
+      <section className="grid gap-8 rounded-[2rem] border border-black/10 bg-[radial-gradient(circle_at_top_left,#ffe8b6_0%,#fff7e7_28%,#eff6ff_65%,#ffffff_100%)] p-8 shadow-[0_40px_100px_rgba(15,23,42,0.08)] lg:grid-cols-[1.3fr_0.7fr]">
+        <div className="grid gap-6">
+          <div className="grid gap-3">
+            <span className="text-xs font-semibold uppercase tracking-[0.35em] text-amber-700">
+              CBS Blog
+            </span>
+            <h1 className="max-w-3xl text-5xl font-semibold tracking-tight text-slate-950 md:text-6xl">
+              Historias, bastidores e atualizacoes publicadas direto do seu painel.
+            </h1>
+            <p className="max-w-2xl text-lg leading-8 text-slate-600">
+              A pagina principal consome posts publicados no MySQL com Prisma,
+              enquanto o painel admin controla criacao, edicao e exclusao.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/admin"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-amber-600"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
+              Abrir admin
+            </Link>
             <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              href="/api/health/db"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-slate-300 px-6 text-sm font-semibold text-slate-700 transition hover:border-slate-950 hover:text-slate-950"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              Testar conexao DB
+            </a>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="grid gap-4 rounded-[1.75rem] border border-white/80 bg-white/70 p-6 backdrop-blur">
+          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+            Stack ativa
+          </span>
+          <div className="grid gap-3 text-sm leading-7 text-slate-700">
+            <p>Next 16 com App Router</p>
+            <p>Prisma 6 conectado ao MySQL</p>
+            <p>CRUD editorial com Server Actions</p>
+            <p>Rotas publicas para home e post interno</p>
+          </div>
         </div>
-      </main>
+      </section>
+
+      <section className="grid gap-6">
+        <div className="flex items-end justify-between gap-4">
+          <div className="grid gap-2">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+              Publicados
+            </span>
+            <h2 className="text-3xl font-semibold tracking-tight text-slate-950">
+              Ultimos artigos do blog
+            </h2>
+          </div>
+        </div>
+
+        {posts.length === 0 ? (
+          <div className="rounded-[2rem] border border-dashed border-slate-300 bg-white/80 p-10 text-center shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
+            <p className="text-lg font-semibold text-slate-900">Nenhum post publicado ainda.</p>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Use o painel admin para criar seu primeiro artigo e marcar como publicado.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-5 lg:grid-cols-2">
+            {posts.map((post) => (
+              <article
+                key={post.id}
+                className="grid gap-4 rounded-[2rem] border border-black/10 bg-white/90 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)]"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-700">
+                    {formatDate(post.createdAt)}
+                  </span>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                    /{post.slug}
+                  </span>
+                </div>
+
+                <div className="grid gap-3">
+                  <h3 className="text-2xl font-semibold tracking-tight text-slate-950">
+                    {post.title}
+                  </h3>
+                  <p className="text-sm leading-7 text-slate-600">
+                    {post.excerpt || `${post.content.slice(0, 180)}...`}
+                  </p>
+                </div>
+
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="inline-flex w-fit items-center rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-950 hover:text-slate-950"
+                >
+                  Ler artigo
+                </Link>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
